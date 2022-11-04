@@ -1,0 +1,151 @@
+{% extends 'store/layouts/main.html' %}
+    {% block content %}
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js" integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script>
+        
+
+
+$(document).ready(function(){
+console.log("hi");
+
+
+
+
+
+//{% comment %} change quantity {% endcomment %}
+
+    
+        
+
+        //delete-cart-item
+        $('.delete-wishlist-item').click(function (e) {
+            e.preventDefault();
+            var product_id=$(this).closest('.product_data').find('.prod_id').val();
+           
+            var token= $('input[name=csrfmiddlewaretoken]').val();
+
+            $.ajax({
+                method:"POST",
+                url:"/delete-wishlist-item",
+                data:{
+                    'product_id':product_id,
+                    
+                    csrfmiddlewaretoken:token,
+                },
+                success:function(response){
+                    console.log(response)
+                    alertify.success(response.status)
+                   // $('cartdata').load(location.href + " .cartdata")
+                   location.reload();
+                }
+        });
+    });
+
+        
+
+
+
+
+
+        
+
+    
+    });
+</script>
+
+    <div class="py-3 bg-primary">
+        <div class="container">
+            <a class="text-white" href="{% url 'home' %}">Home /</a>
+            <a class="text-white" href="{% url 'wishlist' %}">Wishlist </a>
+           
+        </div>
+    </div>
+
+
+    {% comment %} design page {% endcomment %}
+
+    <div class="py-5">
+        <div class="container">
+            <div class="row>">
+                <div class="col-md-12">
+                    <div class="card shadow ">
+                        <div class="card-body">
+                            
+
+                           {% if wishlistitem %}
+                            
+                                
+                           <section class="h-100" style="background-color: #eee;">
+                            <div class="container h-100 py-5 cartdata ">
+                              <div class="row d-flex justify-content-center align-items-center h-100">
+                                <div class="col-10">
+                          
+                                  <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h3 class="fw-normal mb-0 text-black">My Wishlist</h3>
+                                    <div>
+                                      <p class="mb-0"><span class="text-muted">Sort by:</span> <a href="#!" class="text-body">price <i
+                                            class="fas fa-angle-down mt-1"></i></a></p>
+                                    </div>
+                                  </div>
+                                    {% for item in wishlistitem  %}
+                          
+                                  <div class="card rounded-3 mb-4 product_data">
+                                    <div class="card-body p-4">
+                                      <div class="row d-flex justify-content-between align-items-center">
+                                        <div class="col-md-2 col-lg-2 col-xl-2">
+                                          <img
+                                            src="{{item.product.product_image.url}}"
+                                            class="img-fluid rounded-3" alt="Cotton T-shirt">
+                                        </div>
+                                        <div class="col-md-3 col-lg-3 col-xl-3">
+                                          <p class="lead fw-normal mb-2">{{item.product.name}}</p>
+                                         
+                                            <p>Selling Price :{{item.product.selling_price | stringformat:'d'}}</p>
+                                          
+                                        </div>
+                                        {% csrf_token %}
+                                        <input type="hidden" value="{{item.product_id}}" class="prod_id">
+                                        
+                                        <div class="col-md-3">
+                                            {% csrf_token %}
+                                            <a href="{% url 'productview' item.product.category.slug item.product.slug %}" class="btn btn-primary"><i class="fa fa-eye"></i>View Product</a>
+                                            </div>
+                                        </div>
+                                        
+                                      
+                                        
+                                        <div class="col-md-1 col-lg-1 col-xl-1 text-end">
+                                          <button class="text-danger delete-wishlist-item "><i class="fa fa-trash fa-lg"></i>Delete</button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+
+
+                                  {% endfor %}
+                          
+                                  
+                                  
+                          
+                                  
+                          
+                                </div>
+                              </div>
+                            </div>
+                          </section>
+                                
+
+                           {% else %}
+                            <h4>your wishlist is empty</h4>
+                           {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% endblock content %}

@@ -1,0 +1,12 @@
+{% extends 'store/layouts/main.html' %}
+    {% block content %}
+
+        {% include 'store/inc/slider.html' %}
+
+        <br>
+
+        <center><h1>Welcome To Hash Cart</h1></center>
+        <br>
+        <center><a href="{% url 'collections' %}" class="btn btn-success">Click Here to Go to Categories of Products</a></center>
+    {% endblock content %}
+        

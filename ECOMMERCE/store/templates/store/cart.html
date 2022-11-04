@@ -1,0 +1,249 @@
+{% extends 'store/layouts/main.html' %}
+    {% block content %}
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js" integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script>
+        function incrementValue()
+{
+    var value = parseInt(document.getElementById('number').value, 10);
+    value = isNaN(value) ? 0 : value;
+    value++;
+    document.getElementById('number').value = value;
+}
+
+function decrementValue()
+{
+    var value = parseInt(document.getElementById('number').value, 10);
+    value = isNaN(value) ? 0 : value;
+    value--;
+    document.getElementById('number').value = value;
+}
+
+
+$(document).ready(function(){
+console.log("hi");
+$('.addToCartbtn').on("click",function (e){
+    e.preventDefault();    
+        console.log("it is working")
+        var product_id=$(this).closest('.product_data').find('.prod_id').val();
+        var product_qty=$(this).closest('.product_data').find('.qty-input').val();
+        var token= $('input[name=csrfmiddlewaretoken]').val();
+        $.ajax({
+            method:"POST",
+            url:"/add-to-cart",
+            data:{
+                'product_id':product_id,
+                'product_qty':product_qty,
+                csrfmiddlewaretoken:token,
+            },
+            
+            success:function(response){
+                console.log(response)
+                alertify.success(response.status)
+            }
+
+
+        })
+    });
+
+
+
+
+//{% comment %} change quantity {% endcomment %}
+
+    $('.changeQuantity').on("click",function (e){
+
+        e.preventDefault();    
+            console.log("it is working")
+            var product_id=$(this).closest('.product_data').find('.prod_id').val();
+            var product_qty=$(this).closest('.product_data').find('.qty-input').val();
+            var token= $('input[name=csrfmiddlewaretoken]').val();
+            $.ajax({
+                method:"POST",
+                url:"/update-cart",
+                data:{
+                    'product_id':product_id,
+                    'product_qty':product_qty,
+                    csrfmiddlewaretoken:token,
+                },
+                
+                success:function(response){
+                    console.log(response)
+                    //alertify.success(response.status)
+                }
+    
+    
+            })
+
+        });
+        
+
+        //delete-cart-item
+        $('.delete-cart-item').click(function (e) {
+            e.preventDefault();
+            var product_id=$(this).closest('.product_data').find('.prod_id').val();
+           
+            var token= $('input[name=csrfmiddlewaretoken]').val();
+
+            $.ajax({
+                method:"POST",
+                url:"/delete-cart-item",
+                data:{
+                    'product_id':product_id,
+                    
+                    csrfmiddlewaretoken:token,
+                },
+                success:function(response){
+                    console.log(response)
+                    alertify.success(response.status)
+                   // $('cartdata').load(location.href + " .cartdata")
+                   location.reload();
+                }
+        });
+    });
+
+        
+
+
+
+
+
+        
+
+    
+    });
+    
+    
+    
+ 
+    </script>
+    
+
+    <div class="py-3 bg-primary">
+        <div class="container">
+            <a class="text-white" href="{% url 'home' %}">Home /</a>
+            <a class="text-white" href="{% url 'cart' %}">Cart </a>
+           
+        </div>
+    </div>
+
+    {% comment %} <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>{{ products.name}}</h1>
+                <hr>
+                <div class="row">
+                    
+                </div>
+            </div>
+        </div>
+    </div> {% endcomment %}
+
+    <div class="py-5">
+        <div class="container">
+            <div class="row>">
+                <div class="col-md-12">
+                    <div class="card shadow ">
+                        <div class="card-body">
+                            
+
+                           {% if cart %}
+                            
+                                
+                           <section class="h-100" style="background-color: #eee;">
+                            <div class="container h-100 py-5 cartdata ">
+                              <div class="row d-flex justify-content-center align-items-center h-100">
+                                <div class="col-10">
+                          
+                                  <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h3 class="fw-normal mb-0 text-black">Shopping Cart</h3>
+                                    <div>
+                                      <p class="mb-0"><span class="text-muted">Sort by:</span> <a href="#!" class="text-body">price <i
+                                            class="fas fa-angle-down mt-1"></i></a></p>
+                                    </div>
+                                  </div>
+                                    {% for item in cart  %}
+                          
+                                  <div class="card rounded-3 mb-4 product_data">
+                                    <div class="card-body p-4">
+                                      <div class="row d-flex justify-content-between align-items-center">
+                                        <div class="col-md-2 col-lg-2 col-xl-2">
+                                          <img
+                                            src="{{item.product.product_image.url}}"
+                                            class="img-fluid rounded-3" alt="Cotton T-shirt">
+                                        </div>
+                                        <div class="col-md-3 col-lg-3 col-xl-3">
+                                          <p class="lead fw-normal mb-2">{{item.product.name}}</p>
+                                         
+                                            <p>Selling Price :{{item.product.selling_price | stringformat:'d'}}</p>
+                                          
+                                        </div>
+                                        {% csrf_token %}
+                                        <input type="hidden" value="{{item.product_id}}" class="prod_id">
+                                        {% if item.product.quantity >= item.product_qty %}
+                                        <div class="col-md-3">
+                                            {% csrf_token %}
+                                            <input type="hidden" value="{{products.id}}" class="prod_id">
+                                            <label for="Quantity">Quantity</label>
+                                            <div class="input-group text-center mb-3" style="width=130px;">
+                                                <button onclick="decrementValue()" class="input-group-text changeQuantity decrement-btn">-</button>
+                                                <input type="text" name="quantity" class="form-control qty-input text-center" value="{{item.product_qty}}" id="number" >
+                                                <button onClick="incrementValue()" class="input-group-text changeQuantity increment-btn">+</button>
+
+                                            </div>
+                                        </div>
+                                        
+                                        {% else %}
+                                         <h6>Out of Stock</h6>
+                                         {% endif %}
+                                        <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
+                                          <h5 class="mb-0">Rs {{item.product.selling_price}}</h5>
+                                        </div>
+                                        <div class="col-md-1 col-lg-1 col-xl-1 text-end">
+                                          <button class="text-danger delete-cart-item"><i class="fa fa-trash fa-lg"></i></button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+
+
+                                  {% endfor %}
+                          
+                                  
+                                  
+                          
+                                  <div class="card">
+                                    <div class="card-body">
+                                      <a href="{% url 'checkout' %}" class="btn btn-warning ">Checkout Page</a>
+                                    </div>
+                                  </div>
+                          
+                                </div>
+                              </div>
+                            </div>
+                          </section>
+                                
+
+                           {% else %}
+                            <h4>your cart is empty</h4>
+                           {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+    
+
+    
+        
+        
+    {% endblock content %}
